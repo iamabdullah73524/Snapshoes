@@ -132,7 +132,29 @@ router.get('/profile', auth, async (req, res) => {
 });
 
 // ==========================================
-// 4. Addresses Management
+// 4. Admin: Get Total Users
+// ==========================================
+router.get('/users', auth, async (req, res) => {
+  try {
+    const User = getModel('User');
+
+    // Only admin can access
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const users = await User.find({}, '-password');
+
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching users' });
+  }
+});
+
+
+// ==========================================
+// 5. Addresses Management
 // ==========================================
 
 // Get user addresses
