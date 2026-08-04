@@ -42,7 +42,6 @@ export default function Navbar() {
           <a href="#home" className="transition hover:text-[#000]">HOME</a>
           <a href="#featured" className="transition hover:text-[#000]">COLLECTION</a>
           <a href="#featured" className="transition hover:text-[#000]">FOR MEN</a>
-          <a href="#featured" className="transition hover:text-[#000]">FOR HER</a>
           <a href="#featured" className="transition hover:text-[#000]">FOR KIDS</a>
           <a href="#featured" className="transition hover:text-[#000]">BRANDS</a>
           <a href="#featured" className="transition hover:text-[#000]">MORE INFORMATION</a>
