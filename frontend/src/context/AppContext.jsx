@@ -160,6 +160,7 @@ export const AppProvider = ({ children }) => {
 
   // Cart operations
   const addToCart = (product, quantity, size, color) => {
+      console.log("addToCart called");
     if (!size || !color) {
       addToast('Please select size and color', 'error');
       return;
