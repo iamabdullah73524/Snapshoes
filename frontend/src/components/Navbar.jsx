@@ -53,13 +53,13 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden lg:flex items-center gap-12 text-sm font-semibold text-gray-700">
-          <a href="#home" className="transition hover:text-[#000]">HOME</a>
+          {/* <a href="#home" className="transition hover:text-[#000]">HOME</a>
           <a href="#featured" className="transition hover:text-[#000]">COLLECTION</a>
           <a href="#featured" className="transition hover:text-[#000]">FOR MEN</a>
           <a href="#featured" className="transition hover:text-[#000]">FOR KIDS</a>
           <a href="#featured" className="transition hover:text-[#000]">BRANDS</a>
           <a href="#featured" className="transition hover:text-[#000]">MORE INFORMATION</a>
-          <Link to="/wishlist" className="transition hover:text-[#b94f75]">MY WISHLIST</Link>
+          <Link to="/wishlist" className="transition hover:text-[#b94f75]">MY WISHLIST</Link> */}
           <a href="#home" className="transition hover:text-[#000]">
             HOME
           </a>

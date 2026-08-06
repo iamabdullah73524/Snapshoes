@@ -11,7 +11,7 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user'); // For testing/grading ease, we let users pick admin or user
+   // For testing/grading ease, we let users pick admin or user
 
   const redirect = searchParams.get('redirect') || '';
 
@@ -23,7 +23,7 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await register(name, email, password, role);
+  const res = await register(name, email, password);
     if (res.success) {
       navigate(redirect ? `/${redirect}` : '/');
     }
@@ -78,7 +78,7 @@ export default function Register() {
           </div>
 
           {/* Test Role Selection (Extremely convenient for demonstrating admin functions) */}
-          <div className="space-y-1.5">
+          {/* <div className="space-y-1.5">
             <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">Choose Account Type</label>
             <div className="grid grid-cols-2 gap-4">
               <label className={`flex items-center justify-center space-x-2 border rounded-lg py-2 cursor-pointer transition ${role === 'user' ? 'border-brand-orange bg-brand-orange/5 text-brand-orange' : 'border-gray-200 text-gray-400'}`}>
@@ -97,7 +97,7 @@ export default function Register() {
                 <span className="text-xs font-bold uppercase tracking-wider">Administrator</span>
               </label>
             </div>
-          </div>
+          </div> */}
 
           <button
             type="submit"
