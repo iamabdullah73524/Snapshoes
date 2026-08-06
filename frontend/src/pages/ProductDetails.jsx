@@ -193,7 +193,11 @@ export default function ProductDetails() {
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
-                    className={`min-w-[45px] h-[45px] rounded-lg border text-xs font-bold flex items-center justify-center transition-all ${selectedSize === sz ? 'bg-brand-dark text-white border-brand-dark shadow' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}
+                    className={`min-w-[45px] h-[45px] rounded-lg border-2 text-sm font-semibold flex items-center justify-center transition-all duration-300 ${
+                    selectedSize === sz
+                    ? 'bg-black text-white border-black shadow-lg scale-105'
+                    : 'bg-white border-gray-400 text-gray-800 hover:bg-gray-100 hover:border-black hover:text-black'
+                    }`}
                   >
                     {sz}
                   </button>
