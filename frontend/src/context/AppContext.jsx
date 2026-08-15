@@ -10,7 +10,7 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem('cart')) || []);
-  const [wishlist, setWishlist] = useState(JSON.parse(localStorage.getItem('wishlist')) || []);
+  const [wishlist, setWishlist] = useState([]);
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [products, setProducts] = useState([]);
@@ -23,10 +23,12 @@ export const AppProvider = ({ children }) => {
   // Set Authorization Header dynamically
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      localStorage.setItem('token', token);
-      fetchUserProfile();
-    } else {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  localStorage.setItem('token', token);
+
+  fetchUserProfile();
+  fetchWishlist();
+} else {
       delete axios.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
       setUser(null);
@@ -39,9 +41,6 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
 
   // Set up socket.io connection when user log changes
   useEffect(() => {
@@ -95,6 +94,22 @@ export const AppProvider = ({ children }) => {
       console.error("Error fetching notifications:", err);
     }
   };
+
+
+  //fetch wishlist
+  const fetchWishlist = async () => {
+  if (!token) {
+    setWishlist([]);
+    return;
+  }
+
+  try {
+    const res = await axios.get('/wishlist');
+    setWishlist(res.data || []);
+  } catch (err) {
+    console.error('Error fetching wishlist:', err);
+  }
+};
 
   // Fetch user profile on load
   const fetchUserProfile = async () => {
@@ -222,28 +237,58 @@ export const AppProvider = ({ children }) => {
   };
 
   // Wishlist operations
-  const addToWishlist = (product) => {
-    setWishlist((prevWishlist) => {
-      const exists = prevWishlist.some((item) => item._id === product._id);
-      if (exists) {
-        addToast(`${product.name} is already in your wishlist`, 'info');
-        return prevWishlist;
-      }
-      addToast(`${product.name} added to wishlist`, 'success');
-      return [...prevWishlist, product];
-    });
-  };
+  const addToWishlist = async (product) => {
+  if (!token) {
+    addToast('Please login to add items to wishlist', 'error');
+    return;
+  }
 
-  const removeFromWishlist = (productId) => {
-    setWishlist((prevWishlist) => prevWishlist.filter((item) => item._id !== productId));
+  try {
+    const res = await axios.post(`/wishlist/${product._id}`);
+
+    setWishlist(res.data || []);
+
+    addToast(`${product.name} added to wishlist`, 'success');
+  } catch (err) {
+    const msg =
+      err.response?.data?.message ||
+      'Failed to add product to wishlist';
+
+    addToast(msg, 'error');
+  }
+};
+
+ const removeFromWishlist = async (productId) => {
+  try {
+    const res = await axios.delete(`/wishlist/${productId}`);
+
+    setWishlist(res.data || []);
+
     addToast('Removed from wishlist', 'info');
-  };
+  } catch (err) {
+    const msg =
+      err.response?.data?.message ||
+      'Failed to remove product from wishlist';
 
-  const clearWishlist = () => {
+    addToast(msg, 'error');
+  }
+};
+
+  const clearWishlist = async () => {
+  try {
+    await axios.delete('/wishlist');
+
     setWishlist([]);
-    addToast('Wishlist cleared', 'info');
-  };
 
+    addToast('Wishlist cleared', 'info');
+  } catch (err) {
+    const msg =
+      err.response?.data?.message ||
+      'Failed to clear wishlist';
+
+    addToast(msg, 'error');
+  }
+};
   // Catalog loading
   const loadProducts = async (filters = {}) => {
     setLoading(true);
