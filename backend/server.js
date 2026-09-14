@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
 const notificationRoutes = require('./routes/notifications');
+const adminRoutes = require('./routes/admin');
 const wishlistRoutes = require('./routes/wishlist');
 const app = express();
 const server = http.createServer(app);
@@ -26,7 +27,8 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 5000;
 
 // Connect to Database (Mongoose or Fallback JSON files)
-connectDB();
+// Wait for the bootstrap to finish before accepting requests so auth
+// and fallback DB state are initialized consistently.
 
 // Middleware
 app.use(cors());
@@ -43,7 +45,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/wishlist', wishlistRoutes);
+
+const adminRoutes = require('./routes/admin');
+const wishlistRoutes = require('./routes/wishlist');
+
 
 // Root test route
 app.get('/', (req, res) => {
@@ -75,8 +80,17 @@ io.on('connection', (socket) => {
   });
 });
 
-// Start Server
-server.listen(PORT, () => {
-  console.log(`🚀 SANP SHOES Server running on port ${PORT}`);
-  console.log(`🌐 Fallback database mode active: ${global.useMockDB}`);
+// Start Server after database bootstrap finishes
+const startServer = async () => {
+  await connectDB();
+
+  server.listen(PORT, () => {
+    console.log(`🚀 SANP SHOES Server running on port ${PORT}`);
+    console.log(`🌐 Fallback database mode active: ${global.useMockDB}`);
+  });
+};
+
+startServer().catch((err) => {
+  console.error('❌ Failed to start server:', err);
+  process.exit(1);
 });

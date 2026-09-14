@@ -119,10 +119,10 @@ export default function AdminDashboard() {
           </h1>
         </div>
 
-        <div className="flex items-center space-x-3.5">
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             to="/admin/products"
-           className="bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-orange-500 transition"
+            className="bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-orange-500 transition"
           >
             Manage Products
           </Link>
@@ -131,6 +131,18 @@ export default function AdminDashboard() {
             className="border border-gray-300 text-gray-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition"
           >
             Manage Orders
+          </Link>
+          <Link
+            to="/admin/users"
+            className="border border-gray-300 text-gray-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition"
+          >
+            Users
+          </Link>
+          <Link
+            to="/admin/settings"
+            className="border border-gray-300 text-gray-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 transition"
+          >
+            Settings
           </Link>
         </div>
       </div>

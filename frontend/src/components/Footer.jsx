@@ -15,9 +15,12 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <h2 className="text-3xl font-black tracking-[0.3em]">
-              FLARE
+            <h2 className="text-3xl font-black tracking-[0.2em]">
+              SnapShoes
             </h2>
+            <p className="mt-2 text-xs uppercase tracking-[0.35em] text-orange-400">
+              @snapshoes
+            </p>
 
             <p className="mt-5 text-gray-400 text-sm leading-7">
               Discover premium sneakers crafted for comfort,
@@ -117,20 +120,18 @@ export default function Footer() {
               <div className="flex gap-3">
                 <MapPin size={18} className="mt-1" />
                 <span>
-                  Patna,
-                  Bihar,
-                  India
+                  Patna, Ashok Rajpath
                 </span>
               </div>
 
               <div className="flex gap-3">
                 <Phone size={18} />
-                <span>+91 XXXXXXXXXX</span>
+                <span>8210314098</span>
               </div>
 
               <div className="flex gap-3">
                 <Mail size={18} />
-                <span>support@flare.com</span>
+                <span>snapshoes0612@gmail.com</span>
               </div>
 
             </div>
@@ -144,11 +145,11 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-14 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
 
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} FLARE. All Rights Reserved.
+            © {new Date().getFullYear()} @snapshoes. All Rights Reserved.
           </p>
 
           <p className="text-gray-500 text-sm">
-            Designed & Developed by <span className="text-white font-semibold">Abdulla</span>
+            Owner: <span className="text-white font-semibold">Gooddo & Mobasshir</span>
           </p>
 
         </div>

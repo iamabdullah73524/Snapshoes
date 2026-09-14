@@ -12,9 +12,8 @@ export default function ProductCard({ product }) {
   return (
     <div
       onClick={() => navigate(`/product/${product._id}`)}
-      className="group relative flex cursor-pointer flex-col bg-white p-4 rounded-xl border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1.5"
+      className="group relative flex cursor-pointer flex-col rounded-[26px] border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-lg"
     >
-      {/* Wishlist Button */}
       <button
         type="button"
         onClick={(e) => {
@@ -22,75 +21,70 @@ export default function ProductCard({ product }) {
           e.stopPropagation();
           addToWishlist(product);
         }}
-        className={`absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full border transition ${
-          isWishlisted ? 'border-brand-orange bg-brand-orange/10 text-brand-orange' : 'border-gray-200 bg-white text-gray-500 hover:border-brand-orange hover:text-brand-orange'
-        }`}
         aria-label="Add to wishlist"
+        aria-pressed={isWishlisted}
+        className={`absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border transition ${
+          isWishlisted
+            ? 'border-brand-orange bg-brand-orange/10 text-brand-orange'
+            : 'border-gray-200 bg-white text-gray-500 hover:border-brand-orange hover:text-brand-orange'
+        }`}
       >
-        <Heart size={16} />
+        <Heart size={16} fill={isWishlisted ? 'currentColor' : 'none'} />
       </button>
 
-      {/* Sale Tag */}
       {hasSale && (
-        <span className="absolute top-4 left-4 bg-brand-orange text-white text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
+        <span className="absolute left-4 top-4 rounded-full bg-brand-orange px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.2em] text-white">
           sale!
         </span>
       )}
 
-      {/* Out of Stock Tag */}
       {product.inventory === 0 && (
-        <span className="absolute top-16 right-4 bg-brand-dark text-white text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded">
+        <span className="absolute right-4 top-16 rounded-full bg-brand-dark px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.2em] text-white">
           out of stock
         </span>
       )}
 
-      {/* Image Container */}
-      <div className="w-full aspect-[4/3] bg-[#f8f8f8] rounded-lg overflow-hidden flex items-center justify-center p-3 relative">
-        {/* Replace this image URL in the backend product data for each shoe listing. */}
-        <img 
-          src={product.images[0] || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff'} 
-          alt={product.name} 
-          className="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+      <div className="flex aspect-4/3 w-full items-center justify-center overflow-hidden rounded-[22px] bg-[#f8f8f8] p-3">
+        <img
+          src={product.images?.[0] || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff'}
+          alt={product.name}
+          className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110"
         />
       </div>
 
-      {/* Meta Content */}
-      <div className="mt-4 flex-1 flex flex-col justify-between">
+      <div className="mt-4 flex flex-1 flex-col justify-between">
         <div>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.22em] text-gray-400">
             {product.brand}
           </span>
-          <h3 className="text-sm font-bold text-brand-dark group-hover:text-brand-orange transition truncate">
+          <h3 className="truncate text-sm font-bold text-brand-dark transition group-hover:text-brand-orange">
             {product.name}
           </h3>
         </div>
 
-        <div className="mt-2.5 flex items-center justify-between">
-          {/* Rating */}
+        <div className="mt-3 flex items-center justify-between">
           <div className="flex items-center space-x-1">
             <div className="flex items-center text-amber-400">
               {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  size={11} 
-                  fill={i < Math.floor(product.rating || 4) ? "currentColor" : "none"} 
-                  className={i < Math.floor(product.rating || 4) ? "text-amber-400" : "text-gray-200"} 
+                <Star
+                  key={i}
+                  size={11}
+                  fill={i < Math.floor(product.rating || 4) ? 'currentColor' : 'none'}
+                  className={i < Math.floor(product.rating || 4) ? 'text-amber-400' : 'text-gray-200'}
                 />
               ))}
             </div>
-            <span className="text-[10px] text-gray-400 font-medium">({product.reviewCount || 0})</span>
+            <span className="text-[10px] font-medium text-gray-400">({product.reviewCount || 0})</span>
           </div>
 
-          {/* Pricing */}
           <div className="text-right">
             {hasSale ? (
-              <div className="flex items-center space-x-1.5 justify-end">
-                {/* Update price or salePrice values in the backend product data. */}
-                <span className="text-xs text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
-                <span className="text-xs font-extrabold text-brand-dark">₹{product.salePrice.toFixed(2)}</span>
+              <div className="flex items-center justify-end gap-1.5">
+                <span className="text-xs text-gray-400 line-through">₹{Number(product.price || 0).toFixed(2)}</span>
+                <span className="text-xs font-extrabold text-brand-dark">₹{Number(product.salePrice || 0).toFixed(2)}</span>
               </div>
             ) : (
-              <span className="text-xs font-extrabold text-brand-dark">₹{product.price.toFixed(2)}</span>
+              <span className="text-xs font-extrabold text-brand-dark">₹{Number(product.price || 0).toFixed(2)}</span>
             )}
           </div>
         </div>

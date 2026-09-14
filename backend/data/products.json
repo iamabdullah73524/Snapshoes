@@ -22,7 +22,7 @@
     "images": [
   "/images/porsche.avif"
 ],
-    "category": "For Him",
+    "category": "Sneakers",
     "rating": 4.5,
     "reviewCount": 84,
     "isFeatured": true,
@@ -51,7 +51,7 @@
     "images": [
   "/images/air.avif"
 ],
-    "category": "For Her",
+    "category": "Formal",
     "rating": 4.9,
     "reviewCount": 128,
     "isFeatured": true,
@@ -78,7 +78,7 @@
    "images": [
   "/images/yeezy.avif"
 ],
-    "category": "Unisex",
+    "category": "Loafer",
     "rating": 4.8,
     "reviewCount": 312,
     "isFeatured": false,
@@ -104,7 +104,7 @@
     "images": [
   "/images/ninja.avif"
 ],
-    "category": "For Him",
+    "category": "Crocs",
     "rating": 4.3,
     "reviewCount": 61,
     "isFeatured": false,
@@ -134,7 +134,7 @@
     "images": [
   "/images/white.avif"
 ],
-    "category": "Unisex",
+    "category": "Sneakers",
     "rating": 4.6,
     "reviewCount": 92,
     "isFeatured": true,
@@ -160,7 +160,7 @@
     "images": [
   "/images/Retro.avif"
 ],
-    "category": "For Kids",
+    "category": "Flipflop",
     "rating": 4.3,
     "reviewCount": 28,
     "isFeatured": true,
@@ -188,7 +188,7 @@
    "images": [
   "/images/white.avif"
 ],
-    "category": "For Him",
+    "category": "Crocs",
     "rating": 4.7,
     "reviewCount": 73,
     "isFeatured": false,
@@ -217,7 +217,7 @@
    "images": [
   "/images/cloud.avif"
 ],
-    "category": "For Her",
+    "category": "Formal",
     "rating": 4.9,
     "reviewCount": 110,
     "isFeatured": true,
@@ -245,7 +245,7 @@
     "images": [
   "/images/white.avif"
 ],
-    "category": "Unisex",
+    "category": "Loafer",
     "rating": 4.5,
     "reviewCount": 54,
     "isFeatured": false,
@@ -273,7 +273,7 @@
    "images": [
   "/images/white.avif"
 ],
-    "category": "For Her",
+    "category": "Sneakers",
     "rating": 4.6,
     "reviewCount": 36,
     "isFeatured": false,

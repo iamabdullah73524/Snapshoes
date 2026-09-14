@@ -24,8 +24,10 @@ export default function AdminProducts() {
   const [inventory, setInventory] = useState(10);
   const [sizes, setSizes] = useState("7,8,9,10,11");
   const [colors, setColors] = useState("Black,White");
-  const [category, setCategory] = useState("Unisex");
+  const [category, setCategory] = useState("Sneakers");
   const [imageUrl, setImageUrl] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isBestSeller, setIsBestSeller] = useState(false);
 
   useEffect(() => {
     if (!token || !user || user.role !== "admin") {
@@ -59,8 +61,10 @@ export default function AdminProducts() {
     setInventory(10);
     setSizes("7,8,9,10,11");
     setColors("Black,White");
-    setCategory("Unisex");
+    setCategory("Sneakers");
     setImageUrl("");
+    setIsFeatured(false);
+    setIsBestSeller(false);
     setShowModal(true);
   };
 
@@ -74,8 +78,10 @@ export default function AdminProducts() {
     setInventory(p.inventory);
     setSizes(p.sizes?.join(",") || "7,8,9,10,11");
     setColors(p.colors?.join(",") || "Black,White");
-    setCategory(p.category || "Unisex");
+    setCategory(p.category || "Sneakers");
     setImageUrl(p.images ? p.images[0] : "");
+    setIsFeatured(Boolean(p.isFeatured));
+    setIsBestSeller(Boolean(p.isBestSeller));
     setShowModal(true);
   };
 
@@ -96,6 +102,8 @@ export default function AdminProducts() {
       sizes: sizes.split(",").map((s) => parseFloat(s.trim())),
       colors: colors.split(",").map((c) => c.trim()),
       category,
+      isFeatured,
+      isBestSeller,
       images: imageUrl
         ? [imageUrl]
         : ["https://images.unsplash.com/photo-1542291026-7eec264c27ff"],
@@ -366,9 +374,11 @@ export default function AdminProducts() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full bg-brand-gray border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none focus:border-brand-orange font-semibold text-brand-dark"
                   >
-                    <option value="For Him">For Him</option>
-                    <option value="For Her">For Her</option>
-                    <option value="For Kids">For Kids</option>
+                    <option value="Crocs">Crocs</option>
+                    <option value="Formal">Formal</option>
+                    <option value="Loafer">Loafer</option>
+                    <option value="Sneakers">Sneakers</option>
+                    <option value="Flipflop">Flipflop</option>
                     <option value="Unisex">Unisex</option>
                   </select>
                 </div>
@@ -383,6 +393,37 @@ export default function AdminProducts() {
                     placeholder="https://..."
                     className="w-full bg-brand-gray border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none focus:border-brand-orange font-semibold text-brand-dark"
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">
+                    Featured Product
+                  </label>
+                  <label className="flex items-center gap-2 bg-brand-gray border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-brand-dark">
+                    <input
+                      type="checkbox"
+                      checked={isFeatured}
+                      onChange={(e) => setIsFeatured(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-brand-orange focus:ring-brand-orange"
+                    />
+                    Show on Home Featured section
+                  </label>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block">
+                    Best Seller
+                  </label>
+                  <label className="flex items-center gap-2 bg-brand-gray border border-gray-200 rounded-lg p-2.5 text-xs font-semibold text-brand-dark">
+                    <input
+                      type="checkbox"
+                      checked={isBestSeller}
+                      onChange={(e) => setIsBestSeller(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-brand-orange focus:ring-brand-orange"
+                    />
+                    Show on Home Best Sellers
+                  </label>
                 </div>
               </div>
 

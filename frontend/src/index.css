@@ -1,36 +1,105 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    color: #181512;
+    background-color: #f5f0ea;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    background-color: #f7f7f7;
-    color: #111111;
+    background: linear-gradient(180deg, #f5f0ea 0%, #f7f2ee 100%);
+    color: #181512;
     font-family: 'Outfit', 'Inter', sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: rgba(185, 136, 102, 0.2);
+    color: #181512;
+  }
 }
 
-/* Custom premium scrollbar */
+#root {
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.page-shell {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .page-shell {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-shell {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.soft-card {
+  border-radius: 28px;
+  border: 1px solid rgba(24, 21, 18, 0.08);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(24, 21, 18, 0.04);
+}
+
+.section-kicker {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #b98866;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f7f7f7;
-}
-::-webkit-scrollbar-thumb {
-  background: #cccccc;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #ff5a00;
+  background: #f5f0ea;
 }
 
-/* Custom Micro-animations */
+::-webkit-scrollbar-thumb {
+  background: #d8c1ae;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b98866;
+}
+
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(-10deg);
   }
   50% {
@@ -42,7 +111,6 @@
   animation: float 4s ease-in-out infinite;
 }
 
-/* Glassmorphism utility */
 .glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);

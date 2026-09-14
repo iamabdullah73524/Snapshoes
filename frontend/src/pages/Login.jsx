@@ -13,18 +13,30 @@ export default function Login() {
 
   const redirect = searchParams.get("redirect") || "";
 
+  const getSafeRedirectTarget = (role) => {
+    if (role === "admin") {
+      return "/admin/dashboard";
+    }
+
+    if (redirect && !redirect.startsWith("admin/")) {
+      return `/${redirect}`;
+    }
+
+    return "/";
+  };
+
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate(redirect ? `/${redirect}` : "/");
+      navigate(getSafeRedirectTarget(user.role));
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await login(email, password);
     if (res.success) {
-      navigate(redirect ? `/${redirect}` : "/");
+      navigate(getSafeRedirectTarget(res.user?.role));
     }
   };
 

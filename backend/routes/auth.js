@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getModel } = require("../config/db");
-const { auth } = require("../middleware/auth");
+const { auth, admin } = require("../middleware/auth");
 
 // ==========================================
 // 1. User Registration
@@ -63,7 +63,8 @@ router.post("/register", async (req, res) => {
 // 2. User Login
 // ==========================================
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const email = (req.body.email || "").trim().toLowerCase();
+  const password = req.body.password;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Please enter all fields" });
@@ -71,20 +72,67 @@ router.post("/login", async (req, res) => {
 
   try {
     const User = getModel("User");
+    const envAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const envAdminPassword = process.env.ADMIN_PASSWORD;
+    const isEnvAdminAttempt =
+      envAdminEmail &&
+      envAdminPassword &&
+      email === envAdminEmail &&
+      password === envAdminPassword;
 
-    // Find User
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
+
+    if (isEnvAdminAttempt) {
+      if (!user) {
+        const hashedPassword = await bcrypt.hash(envAdminPassword, 10);
+        user = await User.create({
+          name: "SnapShoes Admin",
+          email: envAdminEmail,
+          password: hashedPassword,
+          role: "admin",
+        });
+      } else {
+        const needsSync =
+          user.role !== "admin" ||
+          !(await bcrypt.compare(envAdminPassword, user.password));
+
+        if (needsSync) {
+          const hashedPassword = await bcrypt.hash(envAdminPassword, 10);
+          user = await User.findByIdAndUpdate(user._id, {
+            name: "SnapShoes Admin",
+            email: envAdminEmail,
+            password: hashedPassword,
+            role: "admin",
+          });
+        }
+      }
+
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET || "fallback_secret",
+        { expiresIn: "7d" },
+      );
+
+      return res.json({
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    }
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Verify Password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET || "fallback_secret",
@@ -103,6 +151,85 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("Login Error:", err);
     res.status(500).json({ message: "Server error during login" });
+  }
+});
+
+router.post("/admin-login", async (req, res) => {
+  const email = (req.body.email || "").trim().toLowerCase();
+  const password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Invalid admin credentials" });
+  }
+
+  try {
+    const User = getModel("User");
+    const adminUser = await User.findOne({ email });
+    const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const envPassword = process.env.ADMIN_PASSWORD;
+    const useEnvCredentials =
+      envEmail &&
+      envPassword &&
+      email === envEmail &&
+      password === envPassword;
+
+    if (!adminUser && !useEnvCredentials) {
+      return res.status(401).json({ message: "Invalid admin credentials" });
+    }
+
+    if (adminUser && adminUser.role !== "admin") {
+      return res.status(401).json({ message: "Invalid admin credentials" });
+    }
+
+    let resolvedUser = adminUser;
+
+    if (useEnvCredentials) {
+      if (adminUser) {
+        const needsPasswordSync = !(await bcrypt.compare(envPassword, adminUser.password));
+
+        if (needsPasswordSync || adminUser.name !== "SnapShoes Admin" || adminUser.role !== "admin") {
+          const hashedPassword = await bcrypt.hash(envPassword, 10);
+          resolvedUser = await User.findByIdAndUpdate(adminUser._id, {
+            name: "SnapShoes Admin",
+            email: envEmail,
+            password: hashedPassword,
+            role: "admin",
+          });
+        }
+      } else {
+        const hashedPassword = await bcrypt.hash(envPassword, 10);
+        resolvedUser = await User.create({
+          name: "SnapShoes Admin",
+          email: envEmail,
+          password: hashedPassword,
+          role: "admin",
+        });
+      }
+    } else {
+      const isMatch = await bcrypt.compare(password, adminUser.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid admin credentials" });
+      }
+    }
+
+    const token = jwt.sign(
+      { id: resolvedUser._id, role: resolvedUser.role },
+      process.env.JWT_SECRET || "fallback_secret",
+      { expiresIn: "7d" },
+    );
+
+    res.json({
+      token,
+      user: {
+        id: resolvedUser._id,
+        name: resolvedUser.name,
+        email: resolvedUser.email,
+        role: resolvedUser.role,
+      },
+    });
+  } catch (err) {
+    console.error("Admin Login Error:", err);
+    res.status(500).json({ message: "Server error during admin login" });
   }
 });
 
@@ -132,15 +259,9 @@ router.get("/profile", auth, async (req, res) => {
 // ==========================================
 // 4. Admin: Get Total Users
 // ==========================================
-router.get("/users", auth, async (req, res) => {
+router.get("/users", auth, admin, async (req, res) => {
   try {
     const User = getModel("User");
-
-    // Only admin can access
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
     const users = await User.find({}, "-password");
 
     res.json(users);

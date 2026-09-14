@@ -18,16 +18,11 @@ export function AdminRoute({ children }) {
   const location = useLocation();
 
   if (!user) {
-    return (
-      <Navigate
-        to={`/login?redirect=${location.pathname.replace(/^\//, "")}`}
-        replace
-      />
-    );
+    return <Navigate to={`/login?redirect=${location.pathname.replace(/^\//, "")}`} replace />;
   }
 
   if (user.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

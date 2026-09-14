@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 // Global flag to indicate if we're using mock file-based DB
 global.useMockDB = false;
@@ -19,7 +20,7 @@ const seedProducts = [
     sizes: [7, 8, 9, 10, 11],
     colors: ["Charcoal Black", "Neon Orange", "Steel Grey"],
     images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80"],
-    category: "For Him",
+    category: "Sneakers",
     rating: 4.5,
     reviewCount: 84,
     isFeatured: true,
@@ -36,7 +37,7 @@ const seedProducts = [
     sizes: [6, 7, 8, 9, 10],
     colors: ["Soft Pink", "Off White", "Sail"],
     images: ["https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=900&q=80"],
-    category: "For Her",
+    category: "Formal",
     rating: 4.9,
     reviewCount: 128,
     isFeatured: true,
@@ -53,7 +54,7 @@ const seedProducts = [
     sizes: [8, 9, 10, 11],
     colors: ["Cloud White", "Core Black"],
     images: ["https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=900&q=80"],
-    category: "Unisex",
+    category: "Loafer",
     rating: 4.8,
     reviewCount: 312,
     isFeatured: false,
@@ -70,7 +71,7 @@ const seedProducts = [
     sizes: [7, 8, 9, 10],
     colors: ["Stealth Black"],
     images: ["https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=900&q=80"],
-    category: "For Him",
+    category: "Crocs",
     rating: 4.3,
     reviewCount: 61,
     isFeatured: false,
@@ -87,7 +88,7 @@ const seedProducts = [
     sizes: [5, 6, 7, 8, 9, 10, 11],
     colors: ["Pure White", "Off White"],
     images: ["https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80"],
-    category: "Unisex",
+    category: "Sneakers",
     rating: 4.6,
     reviewCount: 92,
     isFeatured: true,
@@ -104,7 +105,7 @@ const seedProducts = [
     sizes: [8, 9, 10],
     colors: ["Core Black", "Navy Blue"],
     images: ["https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80"],
-    category: "For Kids",
+    category: "Flipflop",
     rating: 4.3,
     reviewCount: 28,
     isFeatured: true,
@@ -121,7 +122,7 @@ const seedProducts = [
     sizes: [7, 8, 9, 10, 11],
     colors: ["Black", "Volt Yellow"],
     images: ["https://images.unsplash.com/photo-1533106418981-0a1a7d0a2c31?auto=format&fit=crop&w=900&q=80"],
-    category: "For Him",
+    category: "Crocs",
     rating: 4.7,
     reviewCount: 73,
     isFeatured: false,
@@ -138,7 +139,7 @@ const seedProducts = [
     sizes: [6, 7, 8, 9, 10, 11],
     colors: ["Sky Blue", "White"],
     images: ["https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=900&q=80"],
-    category: "For Her",
+    category: "Formal",
     rating: 4.9,
     reviewCount: 110,
     isFeatured: true,
@@ -155,7 +156,7 @@ const seedProducts = [
     sizes: [7, 8, 9, 10, 11],
     colors: ["White", "Forest Green"],
     images: ["https://images.unsplash.com/photo-1528701800489-20b9e8f64f18?auto=format&fit=crop&w=900&q=80"],
-    category: "Unisex",
+    category: "Loafer",
     rating: 4.5,
     reviewCount: 54,
     isFeatured: false,
@@ -172,7 +173,7 @@ const seedProducts = [
     sizes: [6, 7, 8, 9, 10],
     colors: ["Sand", "Coral"],
     images: ["https://images.unsplash.com/photo-1519741494640-6f3b58f48e3f?auto=format&fit=crop&w=900&q=80"],
-    category: "For Her",
+    category: "Sneakers",
     rating: 4.6,
     reviewCount: 36,
     isFeatured: false,
@@ -302,21 +303,67 @@ const setupMockDB = () => {
   console.log("⚠️  MongoDB offline. File-based Database fallback initiated at backend/data/");
 };
 
-const connectDB = async () => {
-  if (!process.env.MONGODB_URI) {
-    setupMockDB();
+const ensureAdminUser = async () => {
+  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.warn("⚠️ ADMIN_EMAIL / ADMIN_PASSWORD are not configured. Skipping admin bootstrap.");
     return;
   }
 
   try {
-    // Attempt Mongoose connection with a fast timeout (2.5 seconds)
+    const User = getModel("User");
+    const existingAdmin = await User.findOne({ email: adminEmail });
+
+    if (existingAdmin) {
+      const needsPasswordSync = !(await bcrypt.compare(adminPassword, existingAdmin.password));
+
+      if (needsPasswordSync || existingAdmin.name !== "SnapShoes Admin" || existingAdmin.role !== "admin") {
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        await User.findByIdAndUpdate(existingAdmin._id, {
+          name: "SnapShoes Admin",
+          email: adminEmail,
+          password: hashedPassword,
+          role: "admin",
+        });
+        console.log("✅ Existing admin user synchronized with current env credentials.");
+      }
+
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await User.create({
+      name: "SnapShoes Admin",
+      email: adminEmail,
+      password: hashedPassword,
+      role: "admin",
+    });
+
+    console.log("✅ Default admin user bootstrapped successfully.");
+  } catch (error) {
+    console.error("❌ Failed to bootstrap admin user:", error.message);
+  }
+};
+
+const connectDB = async () => {
+  if (!process.env.MONGODB_URI) {
+    setupMockDB();
+    await ensureAdminUser();
+    return;
+  }
+
+  try {
     await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 2500
+      serverSelectionTimeoutMS: 2500,
     });
     console.log("🔌 MongoDB Connected Successfully!");
+    await ensureAdminUser();
   } catch (error) {
     console.error("❌ MongoDB connection error:", error.message);
     setupMockDB();
+    await ensureAdminUser();
   }
 };
 
